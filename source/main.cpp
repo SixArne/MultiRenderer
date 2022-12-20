@@ -7,8 +7,6 @@
 #undef main
 #include "Renderer.h"
 
-using namespace dae;
-
 void ShutDown(SDL_Window* pWindow)
 {
 	SDL_DestroyWindow(pWindow);
@@ -24,11 +22,12 @@ int main(int argc, char* args[])
 	//Create window + surfaces
 	SDL_Init(SDL_INIT_VIDEO);
 
-	const uint32_t width = 640;
-	const uint32_t height = 480;
+	// 640 480
+	const uint32_t width = 1920;
+	const uint32_t height = 1080;
 
 	SDL_Window* pWindow = SDL_CreateWindow(
-		"DirectX - ***Insert Name/Class***",
+		"DirectX - Six Arne 2DAE08",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		width, height, 0);
@@ -57,7 +56,10 @@ int main(int argc, char* args[])
 				break;
 			case SDL_KEYUP:
 				//Test for a key
-				//if (e.key.keysym.scancode == SDL_SCANCODE_X)
+				if (e.key.keysym.scancode == SDL_SCANCODE_X)
+				{
+					pRenderer->SwitchRenderer();
+				}
 				break;
 			default: ;
 			}

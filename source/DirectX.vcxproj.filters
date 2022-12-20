@@ -8,9 +8,17 @@
     <Filter Include="Misc">
       <UniqueIdentifier>{72056cb6-72a2-42b7-b05e-376f1ddd957e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MeshVariants">
+      <UniqueIdentifier>{3f5ede2c-a5b5-428f-923b-f4448da13674}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderers">
+      <UniqueIdentifier>{280a5fd6-515b-451f-8529-93dc94618c52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D">
+      <UniqueIdentifier>{49753b99-aaa3-47ae-be1b-5e36c1bc0def}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Vector3.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -36,10 +44,38 @@
     <ClInclude Include="ColorRGB.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Shading.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="DirectXMesh.h">
+      <Filter>MeshVariants</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU_Mesh.h">
+      <Filter>MeshVariants</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>MeshVariants</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU_Renderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectX_Renderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Vector3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -56,5 +92,36 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Texture.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXMesh.cpp">
+      <Filter>MeshVariants</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU_Mesh.cpp">
+      <Filter>MeshVariants</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>MeshVariants</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectX_Renderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU_Renderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DirectX_Debug.props" />
+    <None Include="DirectX_Release.props" />
   </ItemGroup>
 </Project>

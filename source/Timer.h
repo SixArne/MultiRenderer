@@ -3,8 +3,7 @@
 //Standard includes
 #include <cstdint>
 
-namespace dae
-{
+
 	class Timer
 	{
 	public:
@@ -47,4 +46,3 @@ namespace dae
 		bool m_IsStopped = true;
 		bool m_ForceElapsedUpperBound = false;
 	};
-}

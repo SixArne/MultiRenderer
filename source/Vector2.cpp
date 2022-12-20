@@ -1,9 +1,11 @@
 #include "pch.h"
-
 #include "Vector2.h"
+
 #include <cassert>
 
-namespace dae {
+#include <cmath>
+
+
 	const Vector2 Vector2::UnitX = Vector2{ 1, 0 };
 	const Vector2 Vector2::UnitY = Vector2{ 0, 1 };
 	const Vector2 Vector2::Zero = Vector2{ 0, 0 };
@@ -114,4 +116,3 @@ namespace dae {
 		return index == 0 ? x : y;
 	}
 #pragma endregion
-}

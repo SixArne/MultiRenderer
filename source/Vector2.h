@@ -1,7 +1,5 @@
 #pragma once
 
-namespace dae
-{
 	struct Vector2
 	{
 		float x{};
@@ -43,4 +41,3 @@ namespace dae
 	{
 		return { v.x * scale, v.y * scale };
 	}
-}

@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "Matrix.h"
 
 #include <cassert>
@@ -7,7 +6,7 @@
 #include "MathHelpers.h"
 #include <cmath>
 
-namespace dae {
+
 	Matrix::Matrix(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis, const Vector3& t) :
 		Matrix({ xAxis, 0 }, { yAxis, 0 }, { zAxis, 0 }, { t, 1 })
 	{
@@ -109,21 +108,21 @@ namespace dae {
 		Vector3 u = a * y - b * x;
 		Vector3 v = c * w - d * z;
 
-		const float det = Vector3::Dot(s, v) + Vector3::Dot(t, u);
+		float det = Vector3::Dot(s, v) + Vector3::Dot(t, u);
 		assert((!AreEqual(det, 0.f)) && "ERROR: determinant is 0, there is no INVERSE!");
-		const float invDet = 1.f / det;
+		float invDet = 1.f / det;
 
 		s *= invDet; t *= invDet; u *= invDet; v *= invDet;
 
-		const Vector3 r0 = Vector3::Cross(b, v) + t * y;
-		const Vector3 r1 = Vector3::Cross(v, a) - t * x;
-		const Vector3 r2 = Vector3::Cross(d, u) + s * w;
-		//Vector3 r3 = Vector3::Cross(u, c) - s * z;
+		Vector3 r0 = Vector3::Cross(b, v) + t * y;
+		Vector3 r1 = Vector3::Cross(v, a) - t * x;
+		Vector3 r2 = Vector3::Cross(d, u) + s * w;
+		Vector3 r3 = Vector3::Cross(u, c) - s * z;
 
 		data[0] = Vector4{ r0.x, r1.x, r2.x, 0.f };
 		data[1] = Vector4{ r0.y, r1.y, r2.y, 0.f };
 		data[2] = Vector4{ r0.z, r1.z, r2.z, 0.f };
-		data[3] = {-Vector3::Dot(b, t),Vector3::Dot(a, t),-Vector3::Dot(d, s),Vector3::Dot(c, s) };
+		data[3] = { { -Vector3::Dot(b, t)},{Vector3::Dot(a, t)},{-Vector3::Dot(d, s)},{Vector3::Dot(c, s)} };
 
 		return *this;
 	}
@@ -146,14 +145,24 @@ namespace dae {
 
 	Matrix Matrix::CreateLookAtLH(const Vector3& origin, const Vector3& forward, const Vector3& up)
 	{
-		assert(false && "Not Implemented");
+		//TODO W1
+
 		return {};
 	}
 
 	Matrix Matrix::CreatePerspectiveFovLH(float fov, float aspect, float zn, float zf)
 	{
-		assert(false && "Not Implemented");
-		return {};
+		const float A = zf / (zf - zn);
+		const float B = (-(zf * zn)) / (zf - zn);
+		const float OneOverAStFOV = (1.f / (aspect * fov));
+		const float OneOverFOV = 1.f / fov;
+
+		return{
+			Vector4{OneOverAStFOV, 0, 0, 0},
+			Vector4{0,OneOverFOV ,0,0},
+			Vector4{0,0,A,1},
+			Vector4{0,0,B,0},
+		};
 	}
 
 	Vector3 Matrix::GetAxisX() const
@@ -281,4 +290,3 @@ namespace dae {
 		return *this;
 	}
 #pragma endregion
-}

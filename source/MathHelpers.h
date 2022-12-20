@@ -1,8 +1,6 @@
 #pragma once
 #include <cmath>
 
-namespace dae
-{
 	/* --- HELPER STRUCTS --- */
 	struct Int2
 	{
@@ -56,4 +54,3 @@ namespace dae
 		if (v > 1.f) return 1.f;
 		return v;
 	}
-}

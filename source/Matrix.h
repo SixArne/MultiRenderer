@@ -2,7 +2,7 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
-namespace dae {
+
 	struct Matrix
 	{
 		Matrix() = default;
@@ -72,4 +72,3 @@ namespace dae {
 		// v2x v2y v2z v2w
 		// v3x v3y v3z v3w
 	};
-}
