@@ -10,7 +10,9 @@
 BaseRenderer::BaseRenderer(SDL_Window* pWindow, Camera* pCamera)
 	:m_pWindow{ pWindow }, m_pCamera{ pCamera }
 {
+
 }
+
 
 
 

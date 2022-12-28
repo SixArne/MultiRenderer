@@ -13,6 +13,7 @@
 #include "CPU_Renderer.h"
 #include "DirectX_Renderer.h"
 #include "Mesh.h"
+#include "RenderConfig.h"
 
 Renderer::Renderer(SDL_Window* pWindow) :
 	m_pWindow(pWindow)
@@ -49,7 +50,10 @@ void Renderer::Update(Timer* pTimer)
 {
 	m_pCamera->Update(pTimer);
 
-	m_pCurrentRenderer->Update(pTimer);
+	if (RENDER_CONFIG->ShouldRotate())
+	{
+		m_pCurrentRenderer->Update(pTimer);
+	}	
 }
 
 void Renderer::Render()
@@ -77,6 +81,21 @@ void Renderer::SwitchRenderer()
 	case API::ENUM_LENGTH:
 		throw std::runtime_error("Unknown API, bug in code");
 	}
+}
+
+void Renderer::SetMoveSpeedFast()
+{
+	m_pCamera->SetMoveSpeedFast();
+}
+
+void Renderer::SetMoveSpeedNormal()
+{
+	m_pCamera->SetMoveSpeedNormal();
+}
+
+void Renderer::ToggleRotation()
+{
+	m_ShouldRotate = !m_ShouldRotate;
 }
 
 void Renderer::SetupVehicle(std::string& meshSrc)

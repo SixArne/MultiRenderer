@@ -6,6 +6,7 @@
 
 #undef main
 #include "Renderer.h"
+#include "RenderConfig.h"
 
 void ShutDown(SDL_Window* pWindow)
 {
@@ -56,9 +57,74 @@ int main(int argc, char* args[])
 				break;
 			case SDL_KEYUP:
 				//Test for a key
-				if (e.key.keysym.scancode == SDL_SCANCODE_X)
+				if (e.key.keysym.scancode == SDL_SCANCODE_F1)
 				{
+					RENDER_CONFIG->CycleRenderer();
 					pRenderer->SwitchRenderer();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
+				{
+					RENDER_CONFIG->ToggleRotation();
+					//pRenderer->ToggleRotation();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+				{
+					pRenderer->SetMoveSpeedNormal();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F9)
+				{
+					RENDER_CONFIG->CycleCullMode();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F10)
+				{
+					RENDER_CONFIG->ToggleUniformColor();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F11)
+				{
+					RENDER_CONFIG->TogglePrintFPS();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
+				{
+					RENDER_CONFIG->ToggleThruster();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F4)
+				{
+					RENDER_CONFIG->CycleSamplingStates();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F5)
+				{
+					RENDER_CONFIG->CycleShadingMode();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+				{
+					RENDER_CONFIG->ToggleNormapMap();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F7)
+				{
+					RENDER_CONFIG->ToggleDepthBuffer();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F8)
+				{
+					RENDER_CONFIG->ToggleBoundingBox();
+				}
+
+				break;
+
+			case SDL_KEYDOWN:
+				if (e.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+				{
+					pRenderer->SetMoveSpeedFast();
 				}
 				break;
 			default: ;
@@ -85,6 +151,9 @@ int main(int argc, char* args[])
 	//Shutdown "framework"
 	delete pRenderer;
 	delete pTimer;
+
+	// Destroy instance
+	RENDER_CONFIG->DestroyInstance();
 
 	ShutDown(pWindow);
 	return 0;

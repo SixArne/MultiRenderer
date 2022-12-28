@@ -28,7 +28,9 @@ struct Camera
 
 	float totalPitch{};
 	float totalYaw{};
-	float moveSpeedPerSecond{ 20.f };
+	float currentSpeedPerSecond{ 20.f };
+	float normalSpeedPerSecond{ 20.f };
+	float highSpeedPerSecond{ 40.f };
 	float aspectRatio{};
 
 	Matrix invViewMatrix{};
@@ -38,6 +40,16 @@ struct Camera
 	Matrix GetViewMatrix() { return viewMatrix; };
 	Matrix GetViewInverseMatrix() { return invViewMatrix; };
 	Matrix GetProjectionMatrix() { return projectionMatrix; };
+
+	void SetMoveSpeedFast() 
+	{
+		currentSpeedPerSecond = highSpeedPerSecond;
+	}
+
+	void SetMoveSpeedNormal()
+	{
+		currentSpeedPerSecond = normalSpeedPerSecond;
+	}
 
 	void Initialize(float ar, float _fovAngle = 90.f, Vector3 _origin = { 0.f,0.f,0.f })
 	{
@@ -93,22 +105,22 @@ struct Camera
 		// Movement
 		if (pKeyboardState[SDL_SCANCODE_W])
 		{
-			origin += forward * moveSpeedPerSecond * deltaTime;
+			origin += forward * currentSpeedPerSecond * deltaTime;
 		}
 
 		if (pKeyboardState[SDL_SCANCODE_S])
 		{
-			origin -= forward * moveSpeedPerSecond * deltaTime;
+			origin -= forward * currentSpeedPerSecond * deltaTime;
 		}
 
 		if (pKeyboardState[SDL_SCANCODE_A])
 		{
-			origin -= right * moveSpeedPerSecond * deltaTime;
+			origin -= right * currentSpeedPerSecond * deltaTime;
 		}
 
 		if (pKeyboardState[SDL_SCANCODE_D])
 		{
-			origin += right * moveSpeedPerSecond * deltaTime;
+			origin += right * currentSpeedPerSecond * deltaTime;
 		}
 
 		//Mouse Input
@@ -129,17 +141,17 @@ struct Camera
 
 		if ((mouseState & SDL_BUTTON_LMASK) != 0 && (mouseState & SDL_BUTTON_RMASK) != 0)
 		{
-			origin += up * moveSpeedPerSecond * deltaTime * mouseY;
+			origin += up * currentSpeedPerSecond * deltaTime * mouseY;
 		}
 		else if ((mouseState & SDL_BUTTON_LMASK) != 0)
 		{
 			if (mouseY > 0)
 			{
-				origin -= forward * moveSpeedPerSecond * deltaTime;
+				origin -= forward * currentSpeedPerSecond * deltaTime;
 			}
 			else if (mouseY < 0)
 			{
-				origin += forward * moveSpeedPerSecond * deltaTime;
+				origin += forward * currentSpeedPerSecond * deltaTime;
 			}
 
 			totalYaw += mouseX;

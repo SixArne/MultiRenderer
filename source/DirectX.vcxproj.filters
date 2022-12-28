@@ -79,6 +79,9 @@
     <ClInclude Include="ThrusterEffect.h">
       <Filter>Renderers</Filter>
     </ClInclude>
+    <ClInclude Include="RenderConfig.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -129,6 +132,9 @@
       <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="ThrusterEffect.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderConfig.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
   </ItemGroup>

@@ -87,6 +87,7 @@
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="DirectXMesh.h" />
     <ClInclude Include="DirectX_Renderer.h" />
+    <ClInclude Include="RenderConfig.h" />
     <ClInclude Include="ThrusterEffect.h" />
     <ClInclude Include="VehicleEffect.h" />
     <ClInclude Include="MathHelpers.h" />
@@ -110,6 +111,7 @@
     <ClCompile Include="CPU_Renderer.cpp" />
     <ClCompile Include="DirectXMesh.cpp" />
     <ClCompile Include="DirectX_Renderer.cpp" />
+    <ClCompile Include="RenderConfig.cpp" />
     <ClCompile Include="ThrusterEffect.cpp" />
     <ClCompile Include="VehicleEffect.cpp" />
     <ClCompile Include="Matrix.cpp">

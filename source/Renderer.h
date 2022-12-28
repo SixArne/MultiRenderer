@@ -39,6 +39,9 @@ public:
 	void Update(Timer* pTimer);
 	void Render();
 	void SwitchRenderer();
+	void SetMoveSpeedFast();
+	void SetMoveSpeedNormal();
+	void ToggleRotation();
 
 private:
 	SDL_Window* m_pWindow{};
@@ -59,4 +62,6 @@ private:
 
 	int m_Width{};
 	int m_Height{};
+
+	bool m_ShouldRotate{ true };
 };
