@@ -1,39 +1,11 @@
 #include "pch.h"
 #include "DirectXMesh.h"
-#include "Effect.h"
+#include "VehicleEffect.h"
 
-DirectXMesh::DirectXMesh(ID3D11Device* pDevice, MeshData* meshData)
+DirectXMesh::DirectXMesh(ID3D11Device* pDevice, BaseEffect* effect, MeshData* meshData)
 {
-	m_pEffect = new Effect(pDevice, std::wstring{ L"Resources/PosCol3D.fx" });
+	m_pEffect = effect;
 	m_pEffectTechnique = m_pEffect->GetTechnique();
-
-	// Vertex layout
-	const uint32_t numElements{ 4 };
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
-
-	// Position
-	vertexDesc[0].SemanticName = "POSITION";
-	vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[0].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	// UV coordinates
-	vertexDesc[1].SemanticName = "TEXCOORD";
-	vertexDesc[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	vertexDesc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	// Normal coordinates
-	vertexDesc[2].SemanticName = "NORMAL";
-	vertexDesc[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	// Tangent coordinates
-	vertexDesc[3].SemanticName = "TANGENT";
-	vertexDesc[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 	// Create vertex buffer
 	D3D11_BUFFER_DESC bd{};
@@ -50,24 +22,6 @@ DirectXMesh::DirectXMesh(ID3D11Device* pDevice, MeshData* meshData)
 	if (FAILED(result))
 	{
 		throw std::runtime_error("Failed to create buffer for mesh");
-		return;
-	}
-
-	// Create input layout
-	D3DX11_PASS_DESC passDesc{};
-	m_pEffectTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
-
-	result = pDevice->CreateInputLayout(
-		vertexDesc,
-		numElements,
-		passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize,
-		&m_pInputLayout
-	);
-
-	if (FAILED(result))
-	{
-		throw std::runtime_error("Failed to create input layout");
 		return;
 	}
 
@@ -95,7 +49,7 @@ DirectXMesh::~DirectXMesh()
 {
 	m_pVertexBuffer->Release();
 	m_pIndexBuffer->Release();
-	m_pInputLayout->Release();
+	
 	delete m_pEffect;
 }
 
@@ -105,7 +59,7 @@ void DirectXMesh::Render(ID3D11DeviceContext* pDeviceContext, Matrix& wvp) const
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// set input layout
-	pDeviceContext->IASetInputLayout(m_pInputLayout);
+	pDeviceContext->IASetInputLayout(m_pEffect->GetInputLayout());
 
 	// Set vertex buffer
 	const UINT stride = sizeof(Vertex);

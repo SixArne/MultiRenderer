@@ -5,53 +5,47 @@ float4x4 gWorld: WORLD;
 
 // Textures
 Texture2D gDiffuseMap: DiffuseMap;
-Texture2D gNormalMap: NormalMap;
-Texture2D gGlossinessMap: GlossinessMap;
-Texture2D gSpecularMap: SpecularMap;
-
-// Light directions
-float3 gLightDir: LightDirection;
 
 RasterizerState gRasterizerState
 {
-	CullMode = back;
-	FrontCounterClockwise = false;
+	CullMode = none;
+	FrontCounterClockwise = true;
 };
 
 BlendState gBlendState
 {
-    BlendEnable[0] = true;
-    SrcBlend = src_alpha;
-    DestBlend = inv_src_alpha;
-    BlendOp = add;
-    SrcBlendAlpha = zero;
-    DestBlendAlpha = zero;
-    BlendOpAlpha = add;
-    RenderTargetWriteMask[0] = 0x0F;
+	BlendEnable[0] = true;
+	SrcBlend = src_alpha;
+	DestBlend = inv_src_alpha;
+	BlendOp = add;
+	SrcBlendAlpha = zero;
+	DestBlendAlpha = zero;
+	BlendOpAlpha = add;
+	RenderTargetWriteMask[0] = 0x0F;
 };
 
 DepthStencilState gDepthStencilState
 {
-    DepthEnable = true;
-    DepthWriteMask = true;
-    DepthFunc = less;
-    StencilEnable = false;
-
-    StencilReadMask = 0x0F;
-    StencilWriteMask = 0x0F;
-
-    FrontFaceStencilFunc = always;
-    BackFaceStencilFunc = always;
-
-    FrontFaceStencilDepthFail = keep;
-    BackFaceStencilDepthFail = keep;
-
-    FrontFaceStencilPass = keep;
-    BackFaceStencilPass = keep;
-
-    FrontFaceStencilFail = keep;
-    BackFaceStencilFail = keep;
+	DepthEnable = true;
+	DepthWriteMask = zero;
+	DepthFunc = less;
+	StencilEnable = false;
+	
+	StencilReadMask = 0x0F;
+	StencilWriteMask = 0x0F;
+	
+	FrontFaceStencilFunc = always;
+	BackFaceStencilFunc = always;
+	
+	FrontFaceStencilPass = keep;
+	BackFaceStencilPass = keep;
+	
+	FrontFaceStencilFail = keep;
+	BackFaceStencilFail = keep;
 };
+
+// Light directions
+float3 gLightDir: LightDirection;
 
 // Constants
 float PI = float(3.14159);
@@ -131,29 +125,11 @@ float3 CalculateLambert(float kd, float3 color)
 // Pixel shader
 float4 PS(VS_OUTPUT input) : SV_TARGET
 {
-	float3 binormal = normalize(cross(input.Normal, input.Tangent));
-	float3x3 tangentSpaceAxis = float3x3(normalize(input.Tangent), binormal, normalize(input.Normal));
-	float3 normalMapSample = gNormalMap.Sample(samPoint, input.Uv).xyz;
-	float3 mappedNormal = 2.f * normalMapSample - 1.f;
-	float3 tangentSpaceNormal = normalize(mul(mappedNormal, tangentSpaceAxis));
 
-	float observedArea = dot(tangentSpaceNormal, -gLightDir);
-	//observedArea = saturate(observedArea);
+	return gDiffuseMap.Sample(samPoint, input.Uv);
+	//float3 diffuse = CalculateLambert(1.f, diffuseMapSample);
+	//float3 finalColor = ((diffuse * INTENSITY) + AMBIENT);
 
-	float3 viewDirection = normalize(input.WorldPosition.xyz - gViewInverse[3].xyz);
-
-	float3 specularMapSample = gSpecularMap.Sample(samPoint, input.Uv).xyz;
-	float3 glossinessMapSample = gGlossinessMap.Sample(samPoint, input.Uv).xyz;
-	float3 diffuseMapSample = gDiffuseMap.Sample(samPoint, input.Uv).xyz;
-
-	float phongValue = CalculatePhong(specularMapSample, glossinessMapSample.x * SHININESS, gLightDir, viewDirection, tangentSpaceNormal);
-	float3 diffuse = CalculateLambert(1.f, diffuseMapSample);
-
-	// ((diffuse * int) + phong + ambient) * obser
-	//float3 finalColor = INTENSITY * (AMBIENT + diffuse + phongValue) * observedArea;
-	float3 finalColor = ((diffuse * INTENSITY) + phongValue + AMBIENT) * observedArea;
-
-	return float4(finalColor, 1);
 }
 
 // Technique
@@ -163,7 +139,7 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(gRasterizerState);
 		SetDepthStencilState(gDepthStencilState, 0);
-        SetBlendState(gBlendState, float4(0.f, 0.f, 0.f, 0.f), 0xFFFFFFFF);
+		SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS()));

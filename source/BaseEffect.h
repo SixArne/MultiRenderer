@@ -1,35 +1,36 @@
-#pragma once
 #include "Texture.h"
 
-class Effect
+#pragma once
+class BaseEffect
 {
 public:
-	Effect(ID3D11Device* pDevice, const std::wstring& assetFile);
-	~Effect();
+	BaseEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
+	virtual ~BaseEffect();
 
 	ID3DX11EffectTechnique* GetTechnique();
 	ID3DX11Effect* GetEffect();
 	ID3DX11EffectMatrixVariable* GetMatrixVariable();
 	void SetDiffuseMap(Texture* pDiffuseMap);
-	void SetNormalMap(Texture* pNormalMap);
-	void SetSpecularMap(Texture* pSpecularMap);
-	void SetGlossinessMap(Texture* pGlossinessMap);
 	void SetLightDirection(Vector3& lightDirection);
 	void SetWorldMatrix(Matrix& worldMatrix);
 	void SetInverseViewMatrix(Matrix& inverseView);
+	virtual void SetNormalMap(Texture* pNormalMap) {};
+	virtual void SetSpecularMap(Texture* pSpecularMap) {};
+	virtual void SetGlossinessMap(Texture* pGlossinessMap) {};
+	ID3D11InputLayout* GetInputLayout();
+
 	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
 
-private:
+protected:
 	ID3DX11Effect* m_pEffect{};
 	ID3DX11EffectTechnique* m_pEffectTechnique{};
 	ID3DX11EffectMatrixVariable* m_pMatWorldViewProjVariable{};
 	ID3DX11EffectShaderResourceVariable* m_pDiffuseMapVariable{};
-	ID3DX11EffectShaderResourceVariable* m_pNormalMapVariable{};
-	ID3DX11EffectShaderResourceVariable* m_pSpecularMapVariable{};
-	ID3DX11EffectShaderResourceVariable* m_pGlossinessMapVariable{};
-	ID3DX11EffectVectorVariable* m_pLightDirVariable{};
 	ID3DX11EffectMatrixVariable* m_pWorldVariable{};
 	ID3DX11EffectMatrixVariable* m_pViewInverseVariable{};
-};
+	ID3DX11EffectVectorVariable* m_pLightDirVariable{};
+	ID3D11InputLayout* m_pInputLayout{};
 
+	virtual void CreateLayout(ID3D11Device* pDevice) = 0;
+};
 

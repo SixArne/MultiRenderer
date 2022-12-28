@@ -20,6 +20,10 @@ inline float EdgeFunction(const Vector2& a, const Vector2& b, const Vector2& c)
 CPU_Renderer::CPU_Renderer(SDL_Window* pWindow, Camera* pCamera, std::vector<MeshData*> pMeshes)
 	: BaseRenderer(pWindow, pCamera)
 {
+	m_RendererColor = ColorRGB{ 0.39f * 255.f, 0.39f * 255.f, 0.39f * 255 };
+	m_UniformColor = ColorRGB{ 0.1f * 255.f, 0.1f * 255.f, 0.1f * 255 };
+	m_CurrentColor = m_RendererColor;
+
 	//Initialize
 	SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 
@@ -98,55 +102,24 @@ void CPU_Renderer::RenderFrame()
 	std::fill_n(m_pDepthBufferPixels, m_Width * m_Height, FLT_MAX);
 
 	// Clear back buffer
-	SDL_FillRect(m_pBackBuffer, &m_pBackBuffer->clip_rect, SDL_MapRGB(m_pBackBuffer->format, 0, 0, 0.4 * 255));
 
-	for (const auto& mesh : m_pMeshes)
+	SDL_FillRect(m_pBackBuffer, &m_pBackBuffer->clip_rect, SDL_MapRGB(m_pBackBuffer->format, m_CurrentColor.r, m_CurrentColor.g, m_CurrentColor.b));
+
+	// Update current rendering mesh
+	auto mesh = m_pMeshes[0];
+	m_pCurrentMeshData = mesh->GetMeshData();
+
+	if (mesh->GetPrimitiveTopology() == PrimitiveTopology::TriangleList)
 	{
-		// Update current rendering mesh
-		m_pCurrentMeshData = mesh->GetMeshData();
+		const uint32_t amountOfTriangles = ((uint32_t)m_pCurrentMeshData->indices.size()) / 3;
 
-		if (mesh->GetPrimitiveTopology() == PrimitiveTopology::TriangleList)
-		{
-			const uint32_t amountOfTriangles = ((uint32_t)m_pCurrentMeshData->indices.size()) / 3;
-
-			concurrency::parallel_for(0u, amountOfTriangles, [=, this](int index)
-				{
-					const Vertex_Out vertex1 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[3 * index]];
-					const Vertex_Out vertex2 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[3 * index + 1]];
-					const Vertex_Out vertex3 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[3 * index + 2]];
-
-					// cull triangles
-					if (vertex1.position.x < 0 || vertex2.position.x < 0 || vertex3.position.x < 0
-						|| vertex1.position.x > m_Width || vertex2.position.x > m_Width || vertex3.position.x > m_Width
-						|| vertex1.position.y < 0 || vertex2.position.y < 0 || vertex3.position.y < 0
-						|| vertex1.position.y > m_Height || vertex2.position.y > m_Height || vertex3.position.y > m_Height
-						)
-					{
-						return;
-					}
-
-					RenderTriangle(vertex1, vertex2, vertex3);
-				});
-		}
-		else if (mesh->GetPrimitiveTopology() == PrimitiveTopology::TriangleStrip)
-		{
-			for (uint32_t indice{}; indice < m_pCurrentMeshData->indices.size() - 2; indice++)
+		concurrency::parallel_for(0u, amountOfTriangles, [=, this](int index)
 			{
-				const Vertex_Out vertex1 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice]];
-				Vertex_Out vertex2{};
-				Vertex_Out vertex3{};
+				const Vertex_Out vertex1 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[3 * index]];
+				const Vertex_Out vertex2 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[3 * index + 1]];
+				const Vertex_Out vertex3 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[3 * index + 2]];
 
-				if (indice & 1)
-				{
-					vertex2 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 2]];
-					vertex3 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 1]];
-				}
-				else
-				{
-					vertex2 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 1]];
-					vertex3 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 2]];
-				}
-
+				// cull triangles
 				if (vertex1.position.x < 0 || vertex2.position.x < 0 || vertex3.position.x < 0
 					|| vertex1.position.x > m_Width || vertex2.position.x > m_Width || vertex3.position.x > m_Width
 					|| vertex1.position.y < 0 || vertex2.position.y < 0 || vertex3.position.y < 0
@@ -158,6 +131,37 @@ void CPU_Renderer::RenderFrame()
 
 				RenderTriangle(vertex1, vertex2, vertex3);
 			}
+		);
+	}
+	else if (mesh->GetPrimitiveTopology() == PrimitiveTopology::TriangleStrip)
+	{
+		for (uint32_t indice{}; indice < m_pCurrentMeshData->indices.size() - 2; indice++)
+		{
+			const Vertex_Out vertex1 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice]];
+			Vertex_Out vertex2{};
+			Vertex_Out vertex3{};
+
+			if (indice & 1)
+			{
+				vertex2 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 2]];
+				vertex3 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 1]];
+			}
+			else
+			{
+				vertex2 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 1]];
+				vertex3 = mesh->GetVerticesOut()[m_pCurrentMeshData->indices[indice + 2]];
+			}
+
+			if (vertex1.position.x < 0 || vertex2.position.x < 0 || vertex3.position.x < 0
+				|| vertex1.position.x > m_Width || vertex2.position.x > m_Width || vertex3.position.x > m_Width
+				|| vertex1.position.y < 0 || vertex2.position.y < 0 || vertex3.position.y < 0
+				|| vertex1.position.y > m_Height || vertex2.position.y > m_Height || vertex3.position.y > m_Height
+				)
+			{
+				return;
+			}
+
+			RenderTriangle(vertex1, vertex2, vertex3);
 		}
 	}
 }
@@ -165,52 +169,49 @@ void CPU_Renderer::RenderFrame()
 void CPU_Renderer::VertexTransformationFunction() const
 {
 	// Calculate once
-	for (auto& cpuMesh : m_pMeshes)
+	MeshData* mesh = m_pMeshes[0]->GetMeshData();
+
+	Matrix worldMatrix = mesh->scaleMatrix * mesh->rotationMatrix * mesh->transformMatrix;
+	const auto worldViewProjectionMatrix = worldMatrix * m_pCamera->viewMatrix * m_pCamera->projectionMatrix;
+
+	m_pMeshes[0]->GetVerticesOut().clear();
+
+	// Loop over indices (every 3 indices is triangle)
+	for (const auto vertex : mesh->vertices)
 	{
-		MeshData* mesh = cpuMesh->GetMeshData();
-
-		Matrix worldMatrix = mesh->scaleMatrix * mesh->rotationMatrix * mesh->transformMatrix;
-		const auto worldViewProjectionMatrix = worldMatrix * m_pCamera->viewMatrix * m_pCamera->projectionMatrix;
-
-		cpuMesh->GetVerticesOut().clear();
-
-		// Loop over indices (every 3 indices is triangle)
-		for (const auto vertex : mesh->vertices)
-		{
-			Vertex_Out rasterVertex{};
+		Vertex_Out rasterVertex{};
 
 
-			auto position = Vector4{ vertex.position, 1 };
+		auto position = Vector4{ vertex.position, 1 };
 
-			// Transform model to raster (screen space)
-			auto transformedVertex = worldViewProjectionMatrix.TransformPoint(position);
-			rasterVertex.viewDirection = worldMatrix.TransformPoint(vertex.position) - m_pCamera->origin;
+		// Transform model to raster (screen space)
+		auto transformedVertex = worldViewProjectionMatrix.TransformPoint(position);
+		rasterVertex.viewDirection = worldMatrix.TransformPoint(vertex.position) - m_pCamera->origin;
 
-			// perspective divide
-			transformedVertex.x /= transformedVertex.w;
-			transformedVertex.y /= transformedVertex.w;
-			transformedVertex.z /= transformedVertex.w;
+		// perspective divide
+		transformedVertex.x /= transformedVertex.w;
+		transformedVertex.y /= transformedVertex.w;
+		transformedVertex.z /= transformedVertex.w;
 
-			// NDC to raster coordinates
-			transformedVertex.x = ((transformedVertex.x + 1) * (float)m_Width) / 2.f;
-			transformedVertex.y = ((1 - transformedVertex.y) * (float)m_Height) / 2.f;
+		// NDC to raster coordinates
+		transformedVertex.x = ((transformedVertex.x + 1) * (float)m_Width) / 2.f;
+		transformedVertex.y = ((1 - transformedVertex.y) * (float)m_Height) / 2.f;
 
-			// Add vertex to vertices out and color
+		// Add vertex to vertices out and color
 
-			rasterVertex.position = transformedVertex;
-			rasterVertex.uv = vertex.uv;
+		rasterVertex.position = transformedVertex;
+		rasterVertex.uv = vertex.uv;
 
-			Vector3 transformedNormals = worldMatrix.TransformVector(vertex.normal);
-			transformedNormals.Normalize();
+		Vector3 transformedNormals = worldMatrix.TransformVector(vertex.normal);
+		transformedNormals.Normalize();
 
-			Vector3 transformedTangent = worldMatrix.TransformVector(vertex.tangent);
-			transformedTangent.Normalize();
+		Vector3 transformedTangent = worldMatrix.TransformVector(vertex.tangent);
+		transformedTangent.Normalize();
 
-			rasterVertex.normal = transformedNormals;
-			rasterVertex.tangent = transformedTangent;
+		rasterVertex.normal = transformedNormals;
+		rasterVertex.tangent = transformedTangent;
 
-			cpuMesh->GetVerticesOut().push_back(rasterVertex);
-		}
+		m_pMeshes[0]->GetVerticesOut().push_back(rasterVertex);
 	}
 }
 
@@ -442,6 +443,7 @@ ColorRGB CPU_Renderer::ShadePixel(const Vertex_Out& vertex)
 
 	const ColorRGB diffuse = Shading::Lambert(1.f, color);
 
-	return light * (ambient + diffuse + specular) * lambertCosine;
+	return ((diffuse * light) + specular + ambient) * lambertCosine;
+	//return light * (ambient + diffuse + specular) * lambertCosine;
 }
 

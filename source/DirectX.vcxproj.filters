@@ -70,7 +70,13 @@
     <ClInclude Include="DirectX_Renderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="Effect.h">
+    <ClInclude Include="VehicleEffect.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseEffect.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="ThrusterEffect.h">
       <Filter>Renderers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -113,10 +119,16 @@
     <ClCompile Include="BaseRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="Effect.cpp">
+    <ClCompile Include="VehicleEffect.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="CPU_Renderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseEffect.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="ThrusterEffect.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
   </ItemGroup>

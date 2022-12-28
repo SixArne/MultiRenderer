@@ -9,10 +9,16 @@
 #include <iostream>
 #include "Mesh.h"
 #include "DirectXMesh.h"
+#include "VehicleEffect.h"
+#include "ThrusterEffect.h"
 
 DirectX_Renderer::DirectX_Renderer(SDL_Window* pWindow, Camera* pCamera, std::vector<MeshData*> pMeshes)
 	: BaseRenderer(pWindow, pCamera)
 {
+	m_RendererColor = ColorRGB{ 0.39f, 0.59f, 0.93f };
+	m_UniformColor = ColorRGB{ 0.1f, 0.1f, 0.1f };
+	m_CurrentColor = m_RendererColor;
+
 	//Initialize
 	SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 
@@ -82,8 +88,7 @@ void DirectX_Renderer::Render()
 		return;
 
 	// Clear RTV and DSV
-	ColorRGB clearColor = ColorRGB{ 0.f, 0.f, 0.3f };
-	m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, &clearColor.r);
+	m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, &m_CurrentColor.r);
 	m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Setup pipeline + invoke draw calls
@@ -233,12 +238,11 @@ HRESULT DirectX_Renderer::InitializeDirectX()
 
 void DirectX_Renderer::CreateMeshes(std::vector<MeshData*>& pMeshes)
 {
-	std::for_each(pMeshes.begin(), pMeshes.end(), [this](MeshData* mesh)
-		{
-			DirectXMesh* newMesh = new DirectXMesh(m_pDevice, mesh);
-			m_pMeshes.push_back(newMesh);
-		}
-	);
+	VehicleEffect* effect = new VehicleEffect(m_pDevice, std::wstring{ L"Resources/PosCol3D.fx" });
+	m_pMeshes.push_back(new DirectXMesh(m_pDevice, effect, pMeshes[0]));
+
+	ThrusterEffect* thrusterEffect = new ThrusterEffect(m_pDevice, std::wstring{ L"Resources/Thruster.fx" });
+	m_pMeshes.push_back(new DirectXMesh(m_pDevice, thrusterEffect, pMeshes[1]));
 }
 
 void DirectX_Renderer::CreateTextureSurfaces(std::vector<MeshData*>& pMeshes)
@@ -247,6 +251,11 @@ void DirectX_Renderer::CreateTextureSurfaces(std::vector<MeshData*>& pMeshes)
 	{
 		for (auto* texture : mesh->textures)
 		{
+			if (texture == nullptr)
+			{
+				continue;
+			}
+
 			auto surface = texture->GetSurface();
 
 			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;

@@ -19,7 +19,12 @@ Renderer::Renderer(SDL_Window* pWindow) :
 {
 	m_pCamera = new Camera{};
 
-	SetupVehicle("Resources/vehicle.obj");
+	std::string vehicleFileLocation{ "Resources/vehicle.obj" };
+	std::string fireFileLocation{ "Resources/fireFX.obj" };
+
+	SetupVehicle(vehicleFileLocation);
+	SetupThruster(fireFileLocation);
+
 	LoadTextures();
 
 	m_pCPURenderer = new CPU_Renderer(pWindow, m_pCamera, m_pMeshes);
@@ -74,12 +79,12 @@ void Renderer::SwitchRenderer()
 	}
 }
 
-void Renderer::SetupVehicle(std::string meshSrc)
+void Renderer::SetupVehicle(std::string& meshSrc)
 {
 	std::vector<Vertex> vertices{};
 	std::vector<uint32_t> indices{};
 
-	Utils::ParseOBJ("Resources/vehicle.obj", vertices, indices);
+	Utils::ParseOBJ(meshSrc, vertices, indices);
 
 	MeshData* mesh = new MeshData{};
 
@@ -99,6 +104,28 @@ void Renderer::SetupVehicle(std::string meshSrc)
 	m_pMeshes.push_back(mesh);
 }
 
+void Renderer::SetupThruster(std::string& meshSrc)
+{
+	std::vector<Vertex> vertices{};
+	std::vector<uint32_t> indices{};
+
+	Utils::ParseOBJ(meshSrc, vertices, indices);
+
+	MeshData* mesh = new MeshData{};
+
+	mesh->vertices = vertices;
+	mesh->indices = indices;
+	mesh->transformMatrix = Matrix::CreateTranslation({ 0,0,50 });
+	mesh->scaleMatrix = Matrix::CreateScale({ 1,1,1 });
+	mesh->yawRotation = 90.f * TO_RADIANS;
+	mesh->rotationMatrix = Matrix::CreateRotationY(mesh->yawRotation);
+	mesh->worldMatrix = mesh->scaleMatrix * mesh->rotationMatrix * mesh->transformMatrix;
+
+	mesh->texturesLocations[0] = "Resources/fireFX_diffuse.png";
+
+	m_pMeshes.push_back(mesh);
+}
+
 void Renderer::LoadTextures()
 {
 	for (MeshData* mesh : m_pMeshes)
@@ -107,7 +134,10 @@ void Renderer::LoadTextures()
 
 		for (const std::string& textureLocation : mesh->texturesLocations)
 		{
-			mesh->textures[textureIndex++] = Texture::LoadFromFile(textureLocation);
+			if (!textureLocation.empty())
+			{
+				mesh->textures[textureIndex++] = Texture::LoadFromFile(textureLocation);
+			}	
 		}
 	}
 }

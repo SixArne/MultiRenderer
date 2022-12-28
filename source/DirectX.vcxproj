@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BaseEffect.h" />
     <ClInclude Include="BaseRenderer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorRGB.h" />
@@ -86,7 +87,8 @@
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="DirectXMesh.h" />
     <ClInclude Include="DirectX_Renderer.h" />
-    <ClInclude Include="Effect.h" />
+    <ClInclude Include="ThrusterEffect.h" />
+    <ClInclude Include="VehicleEffect.h" />
     <ClInclude Include="MathHelpers.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Mesh.h" />
@@ -102,12 +104,14 @@
     <ClInclude Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BaseEffect.cpp" />
     <ClCompile Include="BaseRenderer.cpp" />
     <ClCompile Include="CPU_Mesh.cpp" />
     <ClCompile Include="CPU_Renderer.cpp" />
     <ClCompile Include="DirectXMesh.cpp" />
     <ClCompile Include="DirectX_Renderer.cpp" />
-    <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="ThrusterEffect.cpp" />
+    <ClCompile Include="VehicleEffect.cpp" />
     <ClCompile Include="Matrix.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>

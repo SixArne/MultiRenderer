@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "Effect.h"
+#include "BaseEffect.h"
 
-Effect::Effect(ID3D11Device* pDevice, const std::wstring& assetFile)
+BaseEffect::BaseEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 {
-	m_pEffect = Effect::LoadEffect(pDevice, assetFile);
+	m_pEffect = BaseEffect::LoadEffect(pDevice, assetFile);
 	m_pEffectTechnique = m_pEffect->GetTechniqueByName("DefaultTechnique");
 	if (!m_pEffectTechnique->IsValid())
 	{
@@ -21,24 +21,6 @@ Effect::Effect(ID3D11Device* pDevice, const std::wstring& assetFile)
 	if (!m_pDiffuseMapVariable->IsValid())
 	{
 		std::wcout << L"m_pDiffuseMapVariable is not valid\n";
-	}
-
-	m_pNormalMapVariable = m_pEffect->GetVariableByName("gNormalMap")->AsShaderResource();
-	if (!m_pNormalMapVariable->IsValid())
-	{
-		std::wcout << L"m_pNormalMapVariable is not valid\n";
-	}
-
-	m_pSpecularMapVariable = m_pEffect->GetVariableByName("gSpecularMap")->AsShaderResource();
-	if (!m_pSpecularMapVariable->IsValid())
-	{
-		std::wcout << L"m_pSpecularMapVariable is not valid\n";
-	}
-
-	m_pGlossinessMapVariable = m_pEffect->GetVariableByName("gGlossinessMap")->AsShaderResource();
-	if (!m_pGlossinessMapVariable->IsValid())
-	{
-		std::wcout << L"m_pGlossinessMapVariable is not valid\n";
 	}
 
 	// Matrices
@@ -62,27 +44,27 @@ Effect::Effect(ID3D11Device* pDevice, const std::wstring& assetFile)
 	}
 }
 
-Effect::~Effect()
+BaseEffect::~BaseEffect()
 {
 	m_pEffect->Release();
 }
 
-ID3DX11EffectTechnique* Effect::GetTechnique()
+ID3DX11EffectTechnique* BaseEffect::GetTechnique()
 {
 	return m_pEffectTechnique;
 }
 
-ID3DX11Effect* Effect::GetEffect()
+ID3DX11Effect* BaseEffect::GetEffect()
 {
 	return m_pEffect;
 }
 
-ID3DX11EffectMatrixVariable* Effect::GetMatrixVariable()
+ID3DX11EffectMatrixVariable* BaseEffect::GetMatrixVariable()
 {
 	return m_pMatWorldViewProjVariable;
 }
 
-void Effect::SetDiffuseMap(Texture* pDiffuseMap)
+void BaseEffect::SetDiffuseMap(Texture* pDiffuseMap)
 {
 	if (m_pDiffuseMapVariable)
 	{
@@ -90,31 +72,7 @@ void Effect::SetDiffuseMap(Texture* pDiffuseMap)
 	}
 }
 
-void Effect::SetNormalMap(Texture* pNormalMap)
-{
-	if (m_pNormalMapVariable)
-	{
-		m_pNormalMapVariable->SetResource(pNormalMap->GetSRV());
-	}
-}
-
-void Effect::SetSpecularMap(Texture* pSpecularMap)
-{
-	if (m_pSpecularMapVariable)
-	{
-		m_pSpecularMapVariable->SetResource(pSpecularMap->GetSRV());
-	}
-}
-
-void Effect::SetGlossinessMap(Texture* pGlossinessMap)
-{
-	if (m_pGlossinessMapVariable)
-	{
-		m_pGlossinessMapVariable->SetResource(pGlossinessMap->GetSRV());
-	}
-}
-
-void Effect::SetLightDirection(Vector3& lightDirection)
+void BaseEffect::SetLightDirection(Vector3& lightDirection)
 {
 	if (m_pLightDirVariable)
 	{
@@ -122,7 +80,7 @@ void Effect::SetLightDirection(Vector3& lightDirection)
 	}
 }
 
-void Effect::SetWorldMatrix(Matrix& worldMatrix)
+void BaseEffect::SetWorldMatrix(Matrix& worldMatrix)
 {
 	if (m_pWorldVariable)
 	{
@@ -130,7 +88,7 @@ void Effect::SetWorldMatrix(Matrix& worldMatrix)
 	}
 }
 
-void Effect::SetInverseViewMatrix(Matrix& inverseView)
+void BaseEffect::SetInverseViewMatrix(Matrix& inverseView)
 {
 	if (m_pViewInverseVariable)
 	{
@@ -138,7 +96,12 @@ void Effect::SetInverseViewMatrix(Matrix& inverseView)
 	}
 }
 
-ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
+ID3D11InputLayout* BaseEffect::GetInputLayout()
+{
+	return m_pInputLayout;
+}
+
+ID3DX11Effect* BaseEffect::LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 {
 	HRESULT result{};
 	ID3D10Blob* pErrorBlob{ nullptr };

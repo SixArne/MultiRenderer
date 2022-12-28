@@ -2,13 +2,14 @@
 #include "Mesh.h"
 
 class ID3D11Device;
-class Effect;
+class VehicleEffect;
 class ID3DX11EffectTechnique;
 class ID3D11DeviceContext;
 class Matrix;
 class Vector3;
 class ID3D11Buffer;
 class ID3D11InputLayout;
+class BaseEffect;
 
 class DirectXMesh
 {
@@ -21,7 +22,7 @@ public:
 		Specular
 	};
 
-	DirectXMesh(ID3D11Device* pDevice, MeshData* meshData);
+	DirectXMesh(ID3D11Device* pDevice, BaseEffect* effect, MeshData* meshData);
 	~DirectXMesh();
 	DirectXMesh(const DirectXMesh&) = delete;
 	DirectXMesh(DirectXMesh&&) noexcept = delete;
@@ -40,9 +41,9 @@ private:
 
 	ID3D11Buffer* m_pVertexBuffer{};
 	ID3D11Buffer* m_pIndexBuffer{};
-	Effect* m_pEffect{};
+	BaseEffect* m_pEffect{};
 	ID3DX11EffectTechnique* m_pEffectTechnique{};
-	ID3D11InputLayout* m_pInputLayout{};
+
 
 	uint32_t m_NumIndices{};
 };
