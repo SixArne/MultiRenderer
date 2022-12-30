@@ -11,6 +11,7 @@
 #include "DirectXMesh.h"
 #include "VehicleEffect.h"
 #include "ThrusterEffect.h"
+#include "RenderConfig.h"
 
 DirectX_Renderer::DirectX_Renderer(SDL_Window* pWindow, Camera* pCamera, std::vector<MeshData*> pMeshes)
 	: BaseRenderer(pWindow, pCamera)
@@ -72,13 +73,16 @@ DirectX_Renderer::~DirectX_Renderer()
 
 void DirectX_Renderer::Update(Timer* pTimer)
 {
-	for (DirectXMesh* directXMesh : m_pMeshes)
+	if (RENDER_CONFIG->ShouldRotate())
 	{
-		MeshData* mesh = directXMesh->GetMeshData();
+		for (DirectXMesh* directXMesh : m_pMeshes)
+		{
+			MeshData* mesh = directXMesh->GetMeshData();
 
-		// 1 deg per second
-		const float degreesPerSecond = 25.f;
-		mesh->AddRotationY((degreesPerSecond * pTimer->GetElapsed()) * TO_RADIANS);
+			// 1 deg per second
+			const float degreesPerSecond = RENDER_CONFIG->GetRotationSpeed();
+			mesh->AddRotationY((degreesPerSecond * pTimer->GetElapsed()) * TO_RADIANS);
+		}
 	}
 }
 
@@ -99,6 +103,7 @@ void DirectX_Renderer::Render()
 
 		Matrix inverseView = m_pCamera->GetViewInverseMatrix();
 		Matrix worldMatrix = meshData->worldMatrix;
+		Matrix projMatrix = m_pCamera->GetProjectionMatrix();
 		Matrix wvp = worldMatrix * m_pCamera->GetViewMatrix() * m_pCamera->GetProjectionMatrix();
 
 		mesh->SetWorldMatrix(worldMatrix);

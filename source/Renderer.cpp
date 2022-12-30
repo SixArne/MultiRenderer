@@ -30,8 +30,11 @@ Renderer::Renderer(SDL_Window* pWindow) :
 
 	m_pCPURenderer = new CPU_Renderer(pWindow, m_pCamera, m_pMeshes);
 	m_pDirectXRenderer = new DirectX_Renderer(pWindow, m_pCamera, m_pMeshes);
+	m_pVulkanRenderer = new VulkanRenderer(pWindow, m_pCamera, m_pMeshes);
 
-	m_pCurrentRenderer = m_pCPURenderer;
+	m_pCurrentRenderer = m_pCPURenderer; 
+
+	RENDER_CONFIG->PrintInstructions();
 }
 
 Renderer::~Renderer()
@@ -44,43 +47,40 @@ Renderer::~Renderer()
 	delete m_pCamera;
 	delete m_pCPURenderer;
 	delete m_pDirectXRenderer;
+	delete m_pVulkanRenderer;
 }
 
 void Renderer::Update(Timer* pTimer)
 {
 	m_pCamera->Update(pTimer);
 
-	if (RENDER_CONFIG->ShouldRotate())
-	{
-		m_pCurrentRenderer->Update(pTimer);
-	}	
+	m_pCurrentRenderer->Update(pTimer);
 }
 
 void Renderer::Render()
 {
-	m_pCurrentRenderer->Render();
-}
+	auto api = RENDER_CONFIG->GetCurrentAPI();
 
-void Renderer::SwitchRenderer()
-{
-	const auto APICycleIndex = static_cast<int8_t>(m_CurrentAPI);
-	const auto newAPICycleIndex = (APICycleIndex + 1) % static_cast<int8_t>(API::ENUM_LENGTH);
-
-	m_CurrentAPI = static_cast<API>(newAPICycleIndex);
-
-	switch (m_CurrentAPI)
+	if (RENDER_CONFIG->GetShouldUseVulkan())
 	{
-	case API::DirectX:
-		m_pCurrentRenderer = m_pDirectXRenderer;
-		std::cout << "API: DirectX" << "\n";
-		break;
-	case API::CPU:
-		m_pCurrentRenderer = m_pCPURenderer;
-		std::cout << "API: CPU" << "\n";
-		break;
-	case API::ENUM_LENGTH:
-		throw std::runtime_error("Unknown API, bug in code");
+		m_pCurrentRenderer = m_pVulkanRenderer;
 	}
+	else
+	{
+		switch (api)
+		{
+		case RenderConfig::API::DIRECTX:
+			m_pCurrentRenderer = m_pDirectXRenderer;
+			break;
+		case RenderConfig::API::CPU:
+			m_pCurrentRenderer = m_pCPURenderer;
+			break;
+		case RenderConfig::API::ENUM_LENGTH:
+			throw std::runtime_error("Unknown API, bug in code");
+		}
+	}
+
+	m_pCurrentRenderer->Render();
 }
 
 void Renderer::SetMoveSpeedFast()

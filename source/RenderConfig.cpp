@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RenderConfig.h"
+#include <iostream>
 
 RenderConfig* RenderConfig::s_RenderInstance{ nullptr };
 
@@ -15,6 +16,12 @@ RenderConfig* RenderConfig::GetInstance()
 
 void RenderConfig::CycleRenderer()
 {
+	// stop vulkan renderer when switching
+	if (m_ShouldUseVulkan)
+	{
+		m_ShouldUseVulkan = false;
+	}
+
 	const auto APICycleIndex = static_cast<int8_t>(m_CurrentAPI);
 	const auto newAPICycleIndex = (APICycleIndex + 1) % static_cast<int8_t>(API::ENUM_LENGTH);
 
@@ -117,6 +124,23 @@ void RenderConfig::ToggleBoundingBox()
 	m_ShouldRenderBoundingBox = !m_ShouldRenderBoundingBox;
 }
 
+void RenderConfig::ToggleVulkan()
+{
+	m_ShouldUseVulkan = !m_ShouldUseVulkan;
+
+	if (m_ShouldUseVulkan)
+	{
+		std::cout << "\033[31m"; // TEXT COLOR RED
+		std::cout << "[ENABLE] Vulkan" << std::endl;
+		std::cout << "\033[37m"; // TEXT COLOR WHITE
+	}
+}
+
+bool RenderConfig::GetShouldUseVulkan()
+{
+	return m_ShouldUseVulkan;
+}
+
 void RenderConfig::DestroyInstance()
 {
 	delete s_RenderInstance;
@@ -164,6 +188,37 @@ void RenderConfig::CycleCullMode()
 bool RenderConfig::ShouldPrintFPS()
 {
 	return m_ShouldPrintFPS;
+}
+
+float RenderConfig::GetRotationSpeed()
+{
+	return m_RotationSpeed;
+}
+
+void RenderConfig::PrintInstructions()
+{
+	std::cout << "\033[33m"; // TEXT COLOR
+	std::cout << "[Key Bindings - SHARED]" << std::endl;
+	std::cout << "\t[F1] Toggle Rasterizer Mode (HARDWARE/SOFTWARE)" << std::endl;
+	std::cout << "\t[F2] Toggle Vehicle Rotation (ON/OFF)" << std::endl;
+	std::cout << "\t[F9] Cycle CullMode (BACK/FRONT/NONE)" << std::endl;
+	std::cout << "\t[F10] Toggle Uniform ClearColor (ON/OFF)" << std::endl;
+	std::cout << "\t[F11] Toggle Print FPS (ON/OFF)" << std::endl;
+	std::cout << std::endl;
+	std::cout << "\033[32m"; // TEXT COLOR
+	std::cout << "[Key Bindings - HARDWARE]" << std::endl;
+	std::cout << "\t[F3] Toggle FireFX (ON / OFF)" << std::endl;
+	std::cout << "\t[F4] Cycle Sampler State (POINT / LINEAR / ANISOTROPIC)" << std::endl;
+	std::cout << std::endl;
+	std::cout << "\033[35m"; // TEXT COLOR
+	std::cout << "[Key Bindings - SOFTWARE]" << std::endl;
+	std::cout << "\t[F5] Cycle Shading Mode (COMBINED / OBSERVED_AREA / DIFFUSE / SPECULAR)" << std::endl;
+	std::cout << "\t[F6] Toggle NormalMap (ON / OFF" << std::endl;
+	std::cout << "\t[F7] Toggle DepthBuffer Visualization (ON / OFF)" << std::endl;
+	std::cout << "\t[F8] Toggle BoundingBox Visualization (ON / OFF)" << std::endl;
+	std::cout << "\033[0m"; // TEXT COLOR
+	std::cout << std::endl;
+	std::cout << std::endl;
 }
 
 RenderConfig::API RenderConfig::GetCurrentAPI()

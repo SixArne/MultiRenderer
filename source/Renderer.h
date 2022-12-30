@@ -5,6 +5,7 @@
 
 #include "Camera.h"
 #include "DataTypes.h"
+#include "VulkanRenderer.h"
 
 struct SDL_Window;
 struct SDL_Surface;
@@ -21,12 +22,6 @@ class DirectX_Renderer;
 class Renderer final
 {
 public:
-	enum class API
-	{
-		CPU,
-		DirectX,
-		ENUM_LENGTH
-	};
 
 	Renderer(SDL_Window* pWindow);
 	~Renderer();
@@ -38,7 +33,6 @@ public:
 
 	void Update(Timer* pTimer);
 	void Render();
-	void SwitchRenderer();
 	void SetMoveSpeedFast();
 	void SetMoveSpeedNormal();
 	void ToggleRotation();
@@ -47,14 +41,13 @@ private:
 	SDL_Window* m_pWindow{};
 	CPU_Renderer* m_pCPURenderer{};
 	DirectX_Renderer* m_pDirectXRenderer{};
+	VulkanRenderer* m_pVulkanRenderer{};
 
 	BaseRenderer* m_pCurrentRenderer{};
 	Camera* m_pCamera{};
 
 	// List of meshes
 	std::vector<MeshData*> m_pMeshes{};
-
-	API m_CurrentAPI{ API::CPU };
 
 	void SetupVehicle(std::string& meshSrc);
 	void SetupThruster(std::string& meshSrc);

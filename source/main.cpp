@@ -24,14 +24,14 @@ int main(int argc, char* args[])
 	SDL_Init(SDL_INIT_VIDEO);
 
 	// 640 480
-	const uint32_t width = 1920;
-	const uint32_t height = 1080;
+	const uint32_t width = 640;
+	const uint32_t height = 480;
 
 	SDL_Window* pWindow = SDL_CreateWindow(
 		"DirectX - Six Arne 2DAE08",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		width, height, 0);
+		width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
 
 	if (!pWindow)
 		return 1;
@@ -60,7 +60,6 @@ int main(int argc, char* args[])
 				if (e.key.keysym.scancode == SDL_SCANCODE_F1)
 				{
 					RENDER_CONFIG->CycleRenderer();
-					pRenderer->SwitchRenderer();
 				}
 
 				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
@@ -119,6 +118,11 @@ int main(int argc, char* args[])
 					RENDER_CONFIG->ToggleBoundingBox();
 				}
 
+				if (e.key.keysym.scancode == SDL_SCANCODE_V)
+				{
+					RENDER_CONFIG->ToggleVulkan();
+				}
+
 				break;
 
 			case SDL_KEYDOWN:
@@ -140,10 +144,13 @@ int main(int argc, char* args[])
 		//--------- Timer ---------
 		pTimer->Update();
 		printTimer += pTimer->GetElapsed();
-		if (printTimer >= 1.f)
+		if (RENDER_CONFIG->ShouldPrintFPS())
 		{
-			printTimer = 0.f;
-			std::cout << "dFPS: " << pTimer->GetdFPS() << std::endl;
+			if (printTimer >= 1.f)
+			{
+				printTimer = 0.f;
+				std::cout << "dFPS: " << pTimer->GetdFPS() << std::endl;
+			}
 		}
 	}
 	pTimer->Stop();

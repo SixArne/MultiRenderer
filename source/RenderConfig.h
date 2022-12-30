@@ -1,5 +1,7 @@
 #define RENDER_CONFIG (RenderConfig::GetInstance())
 
+
+
 #pragma once
 class RenderConfig
 {
@@ -50,6 +52,9 @@ public:
 	bool ShouldUseUniformColor();
 	bool ShouldPrintFPS();
 
+	float GetRotationSpeed();
+	void PrintInstructions();
+
 	API GetCurrentAPI();
 	CULL_MODE GetCurrentCullMode();
 
@@ -69,6 +74,13 @@ public:
 	void ToggleDepthBuffer();
 	void ToggleBoundingBox();
 
+
+	/************************************************************************/
+	/* Vulkan																*/
+	/************************************************************************/
+	void ToggleVulkan();
+	bool GetShouldUseVulkan();
+
 	static void DestroyInstance();
 
 private:
@@ -81,7 +93,9 @@ private:
 
 	bool m_ShouldRotate{ true };
 	bool m_ShouldUseUniformColor{ false };
-	bool m_ShouldPrintFPS{ true };
+	bool m_ShouldPrintFPS{ false };
+
+	float m_RotationSpeed{ 25.f };
 	
 	/************************************************************************/
 	/* Hardware only														*/
@@ -98,6 +112,11 @@ private:
 	bool m_ShouldRenderBoundingBox{ false };
 	SHADING_MODE m_CurrentShadingMode{ SHADING_MODE::COMBINED };
 	
+	/************************************************************************/
+	/* Vulkan																*/
+	/************************************************************************/
+	bool m_ShouldUseVulkan{ false };
+
 	CULL_MODE m_CurrentCullMode{ CULL_MODE::BACK };
 	API m_CurrentAPI{ API::CPU};
 };

@@ -9,6 +9,7 @@
 #include "Shading.h"
 #include "Mesh.h"
 #include <ppl.h>
+#include "RenderConfig.h"
 
 inline float EdgeFunction(const Vector2& a, const Vector2& b, const Vector2& c)
 {
@@ -66,13 +67,16 @@ CPU_Renderer::~CPU_Renderer()
 
 void CPU_Renderer::Update(Timer* pTimer)
 {
-	for (CPU_Mesh* CPUMesh : m_pMeshes)
+	if (RENDER_CONFIG->ShouldRotate())
 	{
-		MeshData* mesh = CPUMesh->GetMeshData();
+		for (CPU_Mesh* CPUMesh : m_pMeshes)
+		{
+			MeshData* mesh = CPUMesh->GetMeshData();
 
-		// 1 deg per second
-		const float degreesPerSecond = 25.f;
-		mesh->AddRotationY((degreesPerSecond * pTimer->GetElapsed()) * TO_RADIANS);
+			// 1 deg per second
+			const float degreesPerSecond = RENDER_CONFIG->GetRotationSpeed();
+			mesh->AddRotationY((degreesPerSecond * pTimer->GetElapsed()) * TO_RADIANS);
+		}
 	}
 }
 

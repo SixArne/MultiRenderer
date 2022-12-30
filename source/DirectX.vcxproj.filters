@@ -82,6 +82,12 @@
     <ClInclude Include="RenderConfig.h">
       <Filter>Renderers</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanMesh.h">
+      <Filter>MeshVariants</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -136,6 +142,12 @@
     </ClCompile>
     <ClCompile Include="RenderConfig.cpp">
       <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanMesh.cpp">
+      <Filter>MeshVariants</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
