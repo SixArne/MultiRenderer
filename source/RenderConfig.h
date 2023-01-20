@@ -73,7 +73,10 @@ public:
 	void ToggleNormapMap();
 	void ToggleDepthBuffer();
 	void ToggleBoundingBox();
-
+	bool ShouldRenderNormalMap();
+	bool ShouldRenderDepthBuffer();
+	bool ShouldRenderBoundingBox();
+	SHADING_MODE GetCurrentShadingMode();
 
 	/************************************************************************/
 	/* Vulkan																*/

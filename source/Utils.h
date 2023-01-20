@@ -174,6 +174,11 @@ namespace Utils
 		return true;
 #endif
 	}
+
+	inline static float Remap(float depthValue, float min, float max)
+	{
+		return (depthValue - min) / (max - min);
+	}
 #pragma warning(pop)
 
 

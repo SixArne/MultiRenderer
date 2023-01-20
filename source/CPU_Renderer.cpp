@@ -10,6 +10,7 @@
 #include "Mesh.h"
 #include <ppl.h>
 #include "RenderConfig.h"
+#include "Utils.h"
 
 inline float EdgeFunction(const Vector2& a, const Vector2& b, const Vector2& c)
 {
@@ -245,6 +246,21 @@ void CPU_Renderer::RenderTriangle(Vertex_Out vertex1, Vertex_Out vertex2, Vertex
 	{
 		for (int py{ minY }; py <= maxY; ++py)
 		{
+			if (RENDER_CONFIG->ShouldRenderBoundingBox())
+			{
+				ColorRGB finalColor{ 1,1,1 };
+
+				//Update Color in Buffer
+				finalColor.MaxToOne();
+
+				m_pBackBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBackBuffer->format,
+					static_cast<uint8_t>(finalColor.r * 255),
+					static_cast<uint8_t>(finalColor.g * 255),
+					static_cast<uint8_t>(finalColor.b * 255));
+
+				continue;
+			}
+
 			Vector2 point{ (float)px, (float)py };
 
 			// Barycentric coordinates
@@ -315,16 +331,16 @@ void CPU_Renderer::RenderTriangle(Vertex_Out vertex1, Vertex_Out vertex2, Vertex
 
 					ColorRGB finalColor{  };
 
-					finalColor = ShadePixel(fragmentToShade);
-					/*if (m_CurrentCycle != ShadingCycle::DepthMode)
+					
+					if (!RENDER_CONFIG->ShouldRenderDepthBuffer() && !RENDER_CONFIG->ShouldRenderBoundingBox())
 					{
-						
+						finalColor = ShadePixel(fragmentToShade);
 					}
-					else
+					else if (RENDER_CONFIG->ShouldRenderDepthBuffer())
 					{
 						float depthValue = Utils::Remap(z, 0.995f, 1.f);
 						finalColor = { depthValue, depthValue, depthValue };
-					}*/
+					}
 
 					//Update Color in Buffer
 					finalColor.MaxToOne();
@@ -370,69 +386,76 @@ ColorRGB CPU_Renderer::ShadePixel(const Vertex_Out& vertex)
 	const ColorRGB ambient = { .025f, .025f, .025f };
 	const ColorRGB light = ColorRGB{ 1,1,1 } *lightIntensity;
 
-	// Visible areas with normal map taken into account
-	const float lambertCosine = Vector3::Dot(normalSample, -lightDirection);
+	float lambertCosine{};
+	if (RENDER_CONFIG->ShouldRenderNormalMap())
+	{
+		lambertCosine = Vector3::Dot(normalSample, -lightDirection);
+	}
+	else 
+	{
+		lambertCosine = Vector3::Dot(vertex.normal, -lightDirection);
+	}
 
 	if (lambertCosine <= 0)
 	{
 		return { 0,0,0 };
 	}
 
+	
 
+	switch (RENDER_CONFIG->GetCurrentShadingMode())
+	{
+	case RenderConfig::SHADING_MODE::OBSERVED_AREA:
+	{
+		return { lambertCosine, lambertCosine, lambertCosine };
+	}
+	break;
+	case RenderConfig::SHADING_MODE::DIFFUSE:
+	{
+		const ColorRGB diffuse = Shading::Lambert(1.f, color);
+		return light * diffuse * lambertCosine;
+	}
+	break;
+	case RenderConfig::SHADING_MODE::SPECULAR:
+	{
 
-	//switch (m_CurrentCycle)
-	//{
-	//case ShadingCycle::ObservedArea:
-	//{
-	//	return { lambertCosine, lambertCosine, lambertCosine };
-	//}
-	//break;
-	//case ShadingCycle::Diffuse:
-	//{
-	//	const ColorRGB diffuse = Shading::Lambert(1.f, color);
-	//	return light * diffuse * lambertCosine;
-	//}
-	//break;
-	//case ShadingCycle::Specular:
-	//{
+		const auto specularReflectance = specularColor;
+		const auto phongExponent = glossinessColor * shininess;
 
-	//	const auto specularReflectance = specularColor;
-	//	const auto phongExponent = glossinessColor * shininess;
+		const ColorRGB specular = Shading::Phong(
+			specularReflectance,
+			phongExponent,
+			lightDirection,
+			vertex.viewDirection,
+			vertex.normal
+		);
 
-	//	const ColorRGB specular = Shading::Phong(
-	//		specularReflectance,
-	//		phongExponent,
-	//		lightDirection,
-	//		vertex.viewDirection,
-	//		vertex.normal
-	//	);
+		return specular;
+	}
 
-	//	return specular;
-	//}
+	break;
+	case RenderConfig::SHADING_MODE::COMBINED:
+	{
+		const auto specularReflectance = specularColor;
+		const auto phongExponent = glossinessColor * shininess;
 
-	//break;
-	//case ShadingCycle::Combined:
-	//{
-	//	const auto specularReflectance = specularColor;
-	//	const auto phongExponent = glossinessColor * shininess;
+		const ColorRGB specular = Shading::Phong(
+			specularReflectance,
+			phongExponent,
+			lightDirection,
+			vertex.viewDirection,
+			vertex.normal
+		);
 
-	//	const ColorRGB specular = Shading::Phong(
-	//		specularReflectance,
-	//		phongExponent,
-	//		lightDirection,
-	//		vertex.viewDirection,
-	//		vertex.normal
-	//	);
+		const ColorRGB diffuse = Shading::Lambert(1.f, color);
 
-	//	const ColorRGB diffuse = Shading::Lambert(1.f, color);
+		return light * (ambient + diffuse + specular) * lambertCosine;
+	}
 
-	//	return light * (ambient + diffuse + specular) * lambertCosine;
-	//}
-
-	//break;
-	//case ShadingCycle::ENUM_LENGTH:
-	//	throw std::runtime_error("Unknown mode, bug in code");
-	//}
+	break;
+	case RenderConfig::SHADING_MODE::ENUM_LENGTH:
+		throw std::runtime_error("Unknown mode, bug in code");
+	}
 
 	const auto specularReflectance = specularColor;
 	const auto phongExponent = glossinessColor * shininess;
@@ -448,6 +471,5 @@ ColorRGB CPU_Renderer::ShadePixel(const Vertex_Out& vertex)
 	const ColorRGB diffuse = Shading::Lambert(1.f, color);
 
 	return ((diffuse * light) + specular + ambient) * lambertCosine;
-	//return light * (ambient + diffuse + specular) * lambertCosine;
 }
 

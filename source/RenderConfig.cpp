@@ -112,16 +112,63 @@ void RenderConfig::CycleShadingMode()
 void RenderConfig::ToggleNormapMap()
 {
 	m_ShouldRenderNormalMap = !m_ShouldRenderNormalMap;
+
+	if (m_ShouldRenderNormalMap)
+	{
+		std::cout << "Rendering normal map! [Don't forget to disable this later]" << std::endl;
+	}
+	else
+	{
+		std::cout << "Stopped rendering normal map!" << std::endl;
+	}
 }
 
 void RenderConfig::ToggleDepthBuffer()
 {
 	m_ShouldRenderDepthBuffer = !m_ShouldRenderDepthBuffer;
+
+	if (m_ShouldRenderDepthBuffer)
+	{
+		std::cout << "Showing depth visualization [Don't forget to disable this later]" << std::endl;
+	}
+	else
+	{
+		std::cout << "Stopped showing depth visualization" << std::endl;
+	}
 }
 
 void RenderConfig::ToggleBoundingBox()
 {
 	m_ShouldRenderBoundingBox = !m_ShouldRenderBoundingBox;
+
+	if (m_ShouldRenderBoundingBox)
+	{
+		std::cout << "Showing bounding box optimizations [Don't forget to disable this later]" << std::endl;
+	}
+	else
+	{
+		std::cout << "Stopped showing bounding box optimizations" << std::endl;
+	}
+}
+
+bool RenderConfig::ShouldRenderNormalMap()
+{
+	return m_ShouldRenderNormalMap;
+}
+
+bool RenderConfig::ShouldRenderDepthBuffer()
+{
+	return m_ShouldRenderDepthBuffer;
+}
+
+bool RenderConfig::ShouldRenderBoundingBox()
+{
+	return m_ShouldRenderBoundingBox;
+}
+
+RenderConfig::SHADING_MODE RenderConfig::GetCurrentShadingMode()
+{
+	return m_CurrentShadingMode;
 }
 
 void RenderConfig::ToggleVulkan()
