@@ -117,3 +117,8 @@ void DirectXMesh::SetViewInverse(Matrix& viewInverse)
 {
 	m_pEffect->SetInverseViewMatrix(viewInverse);
 }
+
+BaseEffect* DirectXMesh::GetEffect()
+{
+	return m_pEffect;
+}

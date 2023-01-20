@@ -31,6 +31,25 @@ protected:
 	ID3DX11EffectVectorVariable* m_pLightDirVariable{};
 	ID3D11InputLayout* m_pInputLayout{};
 
+	ID3D11SamplerState* m_pPointSampler{};
+	ID3D11SamplerState* m_pLinearSampler{};
+	ID3D11SamplerState* m_pAnisothropicSampler{};
+
+	ID3D11RasterizerState* m_pRasterizerStateBackFace{};
+	ID3D11RasterizerState* m_pRasterizerStateFrontFace{};
+	ID3D11RasterizerState* m_pRasterizerStateNone{};
+
+	ID3DX11EffectSamplerVariable* m_pSamplerState{};
+	ID3DX11EffectRasterizerVariable* m_pRasterizerState{};
+
 	virtual void CreateLayout(ID3D11Device* pDevice) = 0;
+
+public:
+	void UpdateSamplerState();
+	void UpdateCullModes();
+
+private:
+	void SetupSamplers(ID3D11Device* pDevice);
+	void SetupCullModes(ID3D11Device* pDevice);
 };
 

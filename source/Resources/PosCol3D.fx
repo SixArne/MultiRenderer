@@ -9,14 +9,11 @@ Texture2D gNormalMap: NormalMap;
 Texture2D gGlossinessMap: GlossinessMap;
 Texture2D gSpecularMap: SpecularMap;
 
+SamplerState gSamplerState: ExternalSamplerState;
+RasterizerState gRasterizerState: ExternalRasterizerState;
+
 // Light directions
 float3 gLightDir: LightDirection;
-
-RasterizerState gRasterizerState
-{
-	CullMode = back;
-	FrontCounterClockwise = false;
-};
 
 BlendState gBlendState
 {
@@ -59,27 +56,6 @@ float INTENSITY = float(7.0);
 float SHININESS = float(25.0);
 float3 AMBIENT = float3(0.025, 0.025, 0.025);
 
-SamplerState samPoint
-{
-	Filter = MIN_MAG_MIP_POINT;
-	AddressU = Wrap;// or Mirror, Clamp, Border
-	AddressV = Wrap;
-};
-
-SamplerState samLinear
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;// or Mirror, Clamp, Border
-	AddressV = Wrap;
-};
-
-SamplerState samAnisotropic
-{
-	Filter = ANISOTROPIC;
-	AddressU = Wrap;// or Mirror, Clamp, Border
-	AddressV = Wrap;
-};
-
 struct VS_INPUT
 {
 	float3 Position: POSITION;
@@ -96,9 +72,6 @@ struct VS_OUTPUT
 	float3 Normal: NORMAL;
 	float3 Tangent: TANGENT;
 };
-
-
-
 
 /// Vertex shader
 VS_OUTPUT VS(VS_INPUT input)
@@ -133,7 +106,7 @@ float4 PS(VS_OUTPUT input) : SV_TARGET
 {
 	float3 binormal = normalize(cross(input.Normal, input.Tangent));
 	float3x3 tangentSpaceAxis = float3x3(normalize(input.Tangent), binormal, normalize(input.Normal));
-	float3 normalMapSample = gNormalMap.Sample(samPoint, input.Uv).xyz;
+	float3 normalMapSample = gNormalMap.Sample(gSamplerState, input.Uv).xyz;
 	float3 mappedNormal = 2.f * normalMapSample - 1.f;
 	float3 tangentSpaceNormal = normalize(mul(mappedNormal, tangentSpaceAxis));
 
@@ -142,9 +115,9 @@ float4 PS(VS_OUTPUT input) : SV_TARGET
 
 	float3 viewDirection = normalize(input.WorldPosition.xyz - gViewInverse[3].xyz);
 
-	float3 specularMapSample = gSpecularMap.Sample(samPoint, input.Uv).xyz;
-	float3 glossinessMapSample = gGlossinessMap.Sample(samPoint, input.Uv).xyz;
-	float3 diffuseMapSample = gDiffuseMap.Sample(samPoint, input.Uv).xyz;
+	float3 specularMapSample = gSpecularMap.Sample(gSamplerState, input.Uv).xyz;
+	float3 glossinessMapSample = gGlossinessMap.Sample(gSamplerState, input.Uv).xyz;
+	float3 diffuseMapSample = gDiffuseMap.Sample(gSamplerState, input.Uv).xyz;
 
 	float phongValue = CalculatePhong(specularMapSample, glossinessMapSample.x * SHININESS, gLightDir, viewDirection, tangentSpaceNormal);
 	float3 diffuse = CalculateLambert(1.f, diffuseMapSample);

@@ -27,6 +27,7 @@ void RenderConfig::CycleRenderer()
 
 	m_CurrentAPI = static_cast<API>(newAPICycleIndex);
 
+	std::cout << "\033[33m"; // TEXT COLOR
 	switch (m_CurrentAPI)
 	{
 	case API::DIRECTX:
@@ -38,16 +39,43 @@ void RenderConfig::CycleRenderer()
 	case API::ENUM_LENGTH:
 		throw std::runtime_error("Unknown API, bug in code");
 	}
+	std::cout << "\033[38m"; // TEXT COLOR
 }
 
 void RenderConfig::ToggleRotation()
 {
 	m_ShouldRotate = !m_ShouldRotate;
+
+	if (m_ShouldRotate)
+	{
+		std::cout << "\033[33m"; // TEXT COLOR
+		std::cout << "[ENABLE] Rotation" << std::endl;
+		std::cout << "\033[37m"; // TEXT COLOR WHITE
+	}
+	else 
+	{
+		std::cout << "\033[33m"; // TEXT COLOR
+		std::cout << "[DISABLE] Rotation" << std::endl;
+		std::cout << "\033[37m"; // TEXT COLOR WHITE
+	}
 }
 
 void RenderConfig::ToggleThruster()
 {
 	m_ShouldRenderThruster = !m_ShouldRenderThruster;
+
+	if (m_ShouldRenderThruster)
+	{
+		std::cout << "\033[32m"; // TEXT COLOR
+		std::cout << "[ENABLE] Thruster" << std::endl;
+		std::cout << "\033[37m"; // TEXT COLOR WHITE
+	}
+	else
+	{
+		std::cout << "\033[32m"; // TEXT COLOR
+		std::cout << "[DISABLE] Thurster" << std::endl;
+		std::cout << "\033[37m"; // TEXT COLOR WHITE
+	}
 }
 
 void RenderConfig::CycleSamplingStates()
@@ -57,25 +85,38 @@ void RenderConfig::CycleSamplingStates()
 
 	m_CurrentSampleState = static_cast<SAMPLE_MODE>(newSamplingCycleIndex);
 
+	std::cout << "\033[32m"; // TEXT COLOR
+
 	switch (m_CurrentSampleState)
 	{
 	case SAMPLE_MODE::POINT:
-		std::cout << "API: DirectX" << "\n";
+		std::cout << "Point filtering" << "\n";
 		break;
 	case SAMPLE_MODE::LINEAR:
-		std::cout << "API: CPU" << "\n";
+		std::cout << "Linear filtering" << "\n";
 		break;
 	case SAMPLE_MODE::ANISOTROPIC:
-		std::cout << "API: CPU" << "\n";
+		std::cout << "Anisotropic filtering" << "\n";
 		break;
 	case SAMPLE_MODE::ENUM_LENGTH:
 		throw std::runtime_error("Unknown API, bug in code");
 	}
+
+	std::cout << "\033[37m"; // TEXT COLOR WHITE
 }
 
 bool RenderConfig::ShouldRenderThruster()
 {
 	return m_ShouldRenderThruster;
+
+	if (m_ShouldRenderThruster)
+	{
+		std::cout << "Started Rendering thruster" << std::endl;
+	}
+	else
+	{
+		std::cout << "Stopped rendering thruster" << std::endl;
+	}
 }
 
 RenderConfig::SAMPLE_MODE RenderConfig::GetCurrentSampleState()
@@ -89,6 +130,8 @@ void RenderConfig::CycleShadingMode()
 	const auto newShadingCycleIndex = (shadingCycleIndex + 1) % static_cast<int8_t>(SHADING_MODE::ENUM_LENGTH);
 
 	m_CurrentShadingMode = static_cast<SHADING_MODE>(newShadingCycleIndex);
+
+	std::cout << "\033[35m"; // TEXT COLOR
 
 	switch (m_CurrentShadingMode)
 	{
@@ -107,6 +150,8 @@ void RenderConfig::CycleShadingMode()
 	case SHADING_MODE::ENUM_LENGTH:
 		throw std::runtime_error("Unknown API, bug in code");
 	}
+
+	std::cout << "\033[38m"; // TEXT COLOR
 }
 
 void RenderConfig::ToggleNormapMap()
@@ -115,11 +160,15 @@ void RenderConfig::ToggleNormapMap()
 
 	if (m_ShouldRenderNormalMap)
 	{
+		std::cout << "\033[35m"; // TEXT COLOR
 		std::cout << "Rendering normal map! [Don't forget to disable this later]" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
 	}
 	else
 	{
+		std::cout << "\033[35m"; // TEXT COLOR
 		std::cout << "Stopped rendering normal map!" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
 	}
 }
 
@@ -129,11 +178,15 @@ void RenderConfig::ToggleDepthBuffer()
 
 	if (m_ShouldRenderDepthBuffer)
 	{
+		std::cout << "\033[35m"; // TEXT COLOR
 		std::cout << "Showing depth visualization [Don't forget to disable this later]" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
 	}
 	else
 	{
+		std::cout << "\033[35m"; // TEXT COLOR
 		std::cout << "Stopped showing depth visualization" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
 	}
 }
 
@@ -143,11 +196,15 @@ void RenderConfig::ToggleBoundingBox()
 
 	if (m_ShouldRenderBoundingBox)
 	{
+		std::cout << "\033[35m"; // TEXT COLOR
 		std::cout << "Showing bounding box optimizations [Don't forget to disable this later]" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
 	}
 	else
 	{
+		std::cout << "\033[35m"; // TEXT COLOR
 		std::cout << "Stopped showing bounding box optimizations" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
 	}
 }
 
@@ -181,6 +238,12 @@ void RenderConfig::ToggleVulkan()
 		std::cout << "[ENABLE] Vulkan" << std::endl;
 		std::cout << "\033[37m"; // TEXT COLOR WHITE
 	}
+	else
+	{
+		std::cout << "\033[31m"; // TEXT COLOR RED
+		std::cout << "[DISABLE] Vulkan" << std::endl;
+		std::cout << "\033[37m"; // TEXT COLOR WHITE
+	}
 }
 
 bool RenderConfig::GetShouldUseVulkan()
@@ -207,6 +270,19 @@ bool RenderConfig::ShouldUseUniformColor()
 void RenderConfig::ToggleUniformColor()
 {
 	m_ShouldUseUniformColor = !m_ShouldUseUniformColor;
+
+	if (m_ShouldUseUniformColor)
+	{
+		std::cout << "\033[33m"; // TEXT COLOR
+		std::cout << "Displaying uniform rendering color" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
+	}
+	else
+	{
+		std::cout << "\033[33m"; // TEXT COLOR
+		std::cout << "Showing individual rendering color" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
+	}
 }
 
 void RenderConfig::CycleCullMode()
@@ -215,6 +291,8 @@ void RenderConfig::CycleCullMode()
 	const auto newCullCycleIndex = (cullCycleIndex + 1) % static_cast<int8_t>(CULL_MODE::ENUM_LENGTH);
 
 	m_CurrentCullMode = static_cast<CULL_MODE>(newCullCycleIndex);
+
+	std::cout << "\033[33m"; // TEXT COLOR
 
 	switch (m_CurrentCullMode)
 	{
@@ -230,6 +308,8 @@ void RenderConfig::CycleCullMode()
 	case CULL_MODE::ENUM_LENGTH:
 		throw std::runtime_error("Unknown API, bug in code");
 	}
+
+	std::cout << "\033[38m"; // TEXT COLOR
 }
 
 bool RenderConfig::ShouldPrintFPS()
@@ -281,4 +361,17 @@ RenderConfig::CULL_MODE RenderConfig::GetCurrentCullMode()
 void RenderConfig::TogglePrintFPS()
 {
 	m_ShouldPrintFPS = !m_ShouldPrintFPS;
+
+	if (m_ShouldPrintFPS)
+	{
+		std::cout << "\033[33m"; // TEXT COLOR
+		std::cout << "[Enable] FPS" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
+	}
+	else
+	{
+		std::cout << "\033[33m"; // TEXT COLOR
+		std::cout << "[Disable] FPS" << std::endl;
+		std::cout << "\033[38m"; // TEXT COLOR
+	}
 }

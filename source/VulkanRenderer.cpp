@@ -8,6 +8,9 @@ VulkanRenderer::VulkanRenderer(SDL_Window* pWindow, Camera* pCamera, std::vector
 	:BaseRenderer(pWindow, pCamera)
 {
 	Init(pMeshes);
+
+	m_RendererColor = { 0.8f, 0.1f, 0.2f };
+	m_UniformColor = ColorRGB{ 0.1f, 0.1f, 0.1f };
 }
 
 VulkanRenderer::~VulkanRenderer()
@@ -183,6 +186,8 @@ void VulkanRenderer::Cleanup()
 
 void VulkanRenderer::Render()
 {
+	// call to base render function for uniform color changes
+	BaseRenderer::Render();
 
 	// -- GET NEXT IMAGE --
 
@@ -1170,7 +1175,7 @@ void VulkanRenderer::RecordCommands(uint32_t currentImage)
 	commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
 	std::array<VkClearValue, 2> clearValues = {};
-	clearValues[0].color = { 0.8f, 0.1f, 0.2f, 1.0f };
+	clearValues[0].color = { m_CurrentColor.r, m_CurrentColor.g, m_CurrentColor.b };
 	clearValues[1].depthStencil.depth = 1.f;
 
 	// Info on how to begin a render pass (only graphical applications)

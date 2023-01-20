@@ -36,6 +36,8 @@ public:
 	void SetWorldMatrix(Matrix& world);
 	void SetViewInverse(Matrix& viewInverse);
 
+	BaseEffect* GetEffect();
+
 private:
 	MeshData* m_pMeshData{};
 

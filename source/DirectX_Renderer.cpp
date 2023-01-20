@@ -78,16 +78,25 @@ void DirectX_Renderer::Update(Timer* pTimer)
 		for (DirectXMesh* directXMesh : m_pMeshes)
 		{
 			MeshData* mesh = directXMesh->GetMeshData();
-
+			
 			// 1 deg per second
 			const float degreesPerSecond = RENDER_CONFIG->GetRotationSpeed();
 			mesh->AddRotationY((degreesPerSecond * pTimer->GetElapsed()) * TO_RADIANS);
 		}
 	}
+
+	for (DirectXMesh* directXMesh : m_pMeshes)
+	{
+		directXMesh->GetEffect()->UpdateCullModes();
+		directXMesh->GetEffect()->UpdateSamplerState();
+	}
 }
 
 void DirectX_Renderer::Render()
 {
+	// call to base render function for uniform color changes
+	BaseRenderer::Render();
+
 	if (!m_IsInitialized)
 		return;
 
@@ -96,9 +105,18 @@ void DirectX_Renderer::Render()
 	m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Setup pipeline + invoke draw calls
+	
+	int thrusterIndex = 1;
 
-	for (auto* mesh : m_pMeshes)
+	for (int i{}; i < m_pMeshes.size(); i++)
 	{
+		if (!RENDER_CONFIG->ShouldRenderThruster() && i == thrusterIndex)
+		{
+			break;
+		}
+
+		DirectXMesh* mesh = m_pMeshes[i];
+
 		auto meshData = mesh->GetMeshData();
 
 		Matrix inverseView = m_pCamera->GetViewInverseMatrix();

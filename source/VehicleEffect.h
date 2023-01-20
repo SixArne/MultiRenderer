@@ -19,8 +19,6 @@ private:
 	ID3DX11EffectShaderResourceVariable* m_pNormalMapVariable{};
 	ID3DX11EffectShaderResourceVariable* m_pSpecularMapVariable{};
 	ID3DX11EffectShaderResourceVariable* m_pGlossinessMapVariable{};
-
-	
 };
 
 

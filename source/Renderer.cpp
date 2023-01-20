@@ -18,7 +18,12 @@
 Renderer::Renderer(SDL_Window* pWindow) :
 	m_pWindow(pWindow)
 {
-	m_pCamera = new Camera{};
+	m_pCamera = new Camera{ };
+	
+	int w{}, h{};
+	SDL_GetWindowSize(pWindow, &w, &h);
+
+	m_pCamera->Initialize((float)w / (float)h, 45.f, {0,0,0});
 
 	std::string vehicleFileLocation{ "Resources/vehicle.obj" };
 	std::string fireFileLocation{ "Resources/fireFX.obj" };
@@ -109,7 +114,7 @@ void Renderer::SetupVehicle(std::string& meshSrc)
 
 	mesh->vertices = vertices;
 	mesh->indices = indices;
-	mesh->transformMatrix = Matrix::CreateTranslation({ 0,0,50 });
+	mesh->transformMatrix = Matrix::CreateTranslation({ 0,0,50.f });
 	mesh->scaleMatrix = Matrix::CreateScale({ 1,1,1 });
 	mesh->yawRotation = 90.f * TO_RADIANS;
 	mesh->rotationMatrix = Matrix::CreateRotationY(mesh->yawRotation);
@@ -134,7 +139,7 @@ void Renderer::SetupThruster(std::string& meshSrc)
 
 	mesh->vertices = vertices;
 	mesh->indices = indices;
-	mesh->transformMatrix = Matrix::CreateTranslation({ 0,0,50 });
+	mesh->transformMatrix = Matrix::CreateTranslation({ 0,0,50.f });
 	mesh->scaleMatrix = Matrix::CreateScale({ 1,1,1 });
 	mesh->yawRotation = 90.f * TO_RADIANS;
 	mesh->rotationMatrix = Matrix::CreateRotationY(mesh->yawRotation);

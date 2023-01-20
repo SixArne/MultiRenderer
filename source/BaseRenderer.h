@@ -19,7 +19,7 @@ public:
 	BaseRenderer& operator=(BaseRenderer&&) noexcept = delete;
 
 	virtual void Update(Timer* pTimer) {};
-	virtual void Render() {};
+	virtual void Render();
 
 protected:
 	SDL_Window* m_pWindow{};
@@ -30,6 +30,8 @@ protected:
 	ColorRGB m_RendererColor{};
 	ColorRGB m_UniformColor{};
 	ColorRGB m_CurrentColor{};
+
+	bool m_IsUsingUniformColor{ false };
 
 	Camera* m_pCamera;
 };

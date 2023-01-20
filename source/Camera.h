@@ -19,7 +19,7 @@ struct Camera
 
 
 	Vector3 origin{};
-	float fovAngle{ 90.f };
+	float fovAngle{ 45.f };
 	float fov{ tanf((fovAngle * TO_RADIANS) / 2.f) };
 
 	Vector3 forward{ Vector3::UnitZ };

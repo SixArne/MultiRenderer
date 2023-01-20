@@ -39,9 +39,6 @@ CPU_Renderer::CPU_Renderer(SDL_Window* pWindow, Camera* pCamera, std::vector<Mes
 
 	m_pDepthBufferPixels = new float[m_Width * m_Height];
 
-	//Initialize Camera
-	m_pCamera->Initialize((float)m_Width / (float)m_Height, 90.f, { .0f, .0f, -10.f });
-
 	CreateMeshes(pMeshes);
 }
 
@@ -83,6 +80,9 @@ void CPU_Renderer::Update(Timer* pTimer)
 
 void CPU_Renderer::Render()
 {
+	// call to base render function for uniform color changes
+	BaseRenderer::Render();
+
 	//@START
 	//Lock BackBuffer
 	SDL_LockSurface(m_pBackBuffer);
@@ -241,7 +241,6 @@ void CPU_Renderer::RenderTriangle(Vertex_Out vertex1, Vertex_Out vertex2, Vertex
 	maxX = std::clamp(maxX, 0, m_Width);
 	maxY = std::clamp(maxY, 0, m_Height);
 
-
 	for (int px{ minX }; px <= maxX; ++px)
 	{
 		for (int py{ minY }; py <= maxY; ++py)
@@ -268,9 +267,28 @@ void CPU_Renderer::RenderTriangle(Vertex_Out vertex1, Vertex_Out vertex2, Vertex
 			float w1 = EdgeFunction(v2, v0, point);
 			float w2 = EdgeFunction(v0, v1, point);
 
-
 			// In triangle
-			const bool isInTriangle = w0 >= 0 && w1 >= 0 && w2 >= 0;
+			bool isInTriangle{};
+
+			// culling
+			switch (RENDER_CONFIG->GetCurrentCullMode())
+			{
+				case RenderConfig::CULL_MODE::BACK:
+					{
+						isInTriangle = w0 >= 0 && w1 >= 0 && w2 >= 0;
+					}
+					break;
+				case RenderConfig::CULL_MODE::FRONT:
+					{
+						isInTriangle = w0 < 0 && w1 < 0 && w2 < 0;
+					}
+					break;
+				case RenderConfig::CULL_MODE::NONE:
+					{
+						isInTriangle = w0 >= 0 && w1 >= 0 && w2 >= 0;
+					}
+					break;
+			}
 
 			if (isInTriangle)
 			{
