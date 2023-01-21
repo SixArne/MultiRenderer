@@ -5,6 +5,7 @@ float4x4 gWorld: WORLD;
 
 // Textures
 Texture2D gDiffuseMap: DiffuseMap;
+SamplerState gSamplerState: ExternalSamplerState;
 
 RasterizerState gRasterizerState
 {
@@ -30,16 +31,16 @@ DepthStencilState gDepthStencilState
 	DepthWriteMask = zero;
 	DepthFunc = less;
 	StencilEnable = false;
-	
+
 	StencilReadMask = 0x0F;
 	StencilWriteMask = 0x0F;
-	
+
 	FrontFaceStencilFunc = always;
 	BackFaceStencilFunc = always;
-	
+
 	FrontFaceStencilPass = keep;
 	BackFaceStencilPass = keep;
-	
+
 	FrontFaceStencilFail = keep;
 	BackFaceStencilFail = keep;
 };
@@ -52,27 +53,6 @@ float PI = float(3.14159);
 float INTENSITY = float(7.0);
 float SHININESS = float(25.0);
 float3 AMBIENT = float3(0.025, 0.025, 0.025);
-
-SamplerState samPoint
-{
-	Filter = MIN_MAG_MIP_POINT;
-	AddressU = Wrap;// or Mirror, Clamp, Border
-	AddressV = Wrap;
-};
-
-SamplerState samLinear
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;// or Mirror, Clamp, Border
-	AddressV = Wrap;
-};
-
-SamplerState samAnisotropic
-{
-	Filter = ANISOTROPIC;
-	AddressU = Wrap;// or Mirror, Clamp, Border
-	AddressV = Wrap;
-};
 
 struct VS_INPUT
 {
@@ -126,7 +106,7 @@ float3 CalculateLambert(float kd, float3 color)
 float4 PS(VS_OUTPUT input) : SV_TARGET
 {
 
-	return gDiffuseMap.Sample(samPoint, input.Uv);
+	return gDiffuseMap.Sample(gSamplerState, input.Uv);
 	//float3 diffuse = CalculateLambert(1.f, diffuseMapSample);
 	//float3 finalColor = ((diffuse * INTENSITY) + AMBIENT);
 

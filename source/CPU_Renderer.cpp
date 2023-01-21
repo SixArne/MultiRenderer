@@ -182,7 +182,7 @@ void CPU_Renderer::VertexTransformationFunction() const
 	m_pMeshes[0]->GetVerticesOut().clear();
 
 	// Loop over indices (every 3 indices is triangle)
-	for (const auto vertex : mesh->vertices)
+	for (const auto& vertex : mesh->vertices)
 	{
 		Vertex_Out rasterVertex{};
 
@@ -285,7 +285,7 @@ void CPU_Renderer::RenderTriangle(Vertex_Out vertex1, Vertex_Out vertex2, Vertex
 					break;
 				case RenderConfig::CULL_MODE::NONE:
 					{
-						isInTriangle = w0 >= 0 && w1 >= 0 && w2 >= 0;
+						isInTriangle = (w0 >= 0 && w1 >= 0 && w2 >= 0) || (w0 <= 0 && w1 <= 0 && w2 <= 0);
 					}
 					break;
 			}
@@ -467,7 +467,7 @@ ColorRGB CPU_Renderer::ShadePixel(const Vertex_Out& vertex)
 
 		const ColorRGB diffuse = Shading::Lambert(1.f, color);
 
-		return light * (ambient + diffuse + specular) * lambertCosine;
+		return ((diffuse * light) + specular + ambient) * lambertCosine;
 	}
 
 	break;

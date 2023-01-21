@@ -663,7 +663,7 @@ void VulkanRenderer::CreateGraphicsPipeline()
 	// VK_VERTEX_INPUT_RATE_VERTEX		: move on to next vertex
 	// VK_VERTEX_INPUT_RATE_INSTANCE	: move on to vertex for next instance (can draw 100 trees as 1 tree)
 
-// How the data for an attribute is defined within a vertex
+	// How the data for an attribute is defined within a vertex
 	std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions{};
 
 	// Position attribute
@@ -1172,7 +1172,7 @@ void VulkanRenderer::UpdateUniformBuffers(uint32_t imageIndex)
 void VulkanRenderer::RecordCommands(uint32_t currentImage)
 {
 	VkCommandBufferBeginInfo commandBufferBeginInfo{};
-	commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO ;
 
 	std::array<VkClearValue, 2> clearValues = {};
 	clearValues[0].color = { m_CurrentColor.r, m_CurrentColor.g, m_CurrentColor.b };

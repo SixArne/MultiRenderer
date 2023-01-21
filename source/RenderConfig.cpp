@@ -345,6 +345,15 @@ void RenderConfig::PrintInstructions()
 	std::cout << "\t[F8] Toggle BoundingBox Visualization (ON / OFF)" << std::endl;
 	std::cout << "\033[0m"; // TEXT COLOR
 	std::cout << std::endl;
+	std::cout << "\033[31m"; // TEXT COLOR
+	std::cout << "[Extra Features]" << std::endl;
+	std::cout << "\t- Vulkan renderer" << std::endl;
+	std::cout << "\t- CPU multi-threaded" << std::endl;
+	std::cout << std::endl;
+	std::cout << "[Extra Key Bindings - Vulkan]" << std::endl;
+	std::cout << "\t[V] Toggle Vulkan (ON / OFF" << std::endl;
+	std::cout << "\033[0m"; // TEXT COLOR
+	std::cout << std::endl;
 	std::cout << std::endl;
 }
 

@@ -28,7 +28,7 @@ int main(int argc, char* args[])
 	const uint32_t height = 480;
 
 	SDL_Window* pWindow = SDL_CreateWindow(
-		"DirectX - Six Arne 2DAE08",
+		"DualRasterizer - Six Arne 2DAE08",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
